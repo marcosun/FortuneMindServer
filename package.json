@@ -1,0 +1,38 @@
+{
+  "name": "fortune-mind-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=dev node -r babel-register -r babel-polyfill ./index.js",
+    "debug": "cross-env NODE_ENV=dev DEBUG=express* node -r babel-register -r babel-polyfill ./index.js"
+  },
+  "author": "Marco",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.23.0",
+    "cross-env": "^3.2.3",
+    "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.1",
+    "cors": "^2.8.1",
+    "express": "^4.15.2",
+    "imagemin": "^5.2.2",
+    "imagemin-mozjpeg": "^6.0.0",
+    "method-override": "^2.3.7",
+    "mongoose": "^4.9.0",
+    "morgan": "^1.8.1",
+    "multer": "^1.3.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0"
+  }
+}
