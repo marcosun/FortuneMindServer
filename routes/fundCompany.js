@@ -1,10 +1,12 @@
+import mongoose from 'mongoose';
+
 import FundCompanyModel, { paths } from '../models/fundCompany';
 import FundCompanyTypeModel from '../models/fundCompanyType';
 
 export function getFundCompany (req, res, next) {
     
     FundCompanyModel.find()
-        .select('name type logo -_id')
+        .select('name type logo')
         .populate('type', 'name -_id')
         .exec((err, fundCompanies) => {
         
@@ -23,73 +25,41 @@ export function postFundCompany (req, res, next) {
     
     const data = req.body;
     
-    const fundCompanyTypeName = data.type;
+    let fundCompany = {};
     
-    FundCompanyTypeModel.findOne({name: fundCompanyTypeName})
-        .exec((err, fundCompanyType) => {
-            //find company type with type name
-            if (err) {
-                res.status(403).send({errMsg: '类型不存在'});
-                return next();
+    for (let path of paths) {
+        
+        if (req.body[path] !== undefined) {
+            fundCompany[path] = req.body[path];
+        }
+    }
+    
+    if (fundCompany.type) {
+        fundCompany.type = mongoose.Types.ObjectId(fundCompany.type);
+    }
+    
+    FundCompanyModel.create(fundCompany, (err) => {
+
+        if (err) {
+
+            switch (err.code) {
+                case 11000:
+                    res.status(403).send({errMsg: '基金公司已经存在'});
+                    break;
+                default:
+                    res.status(500).send(err);
             }
 
-            if (fundCompanyType == null) {
-                res.status(403).send({errMsg: '类型不存在'});
-                return next();
-            }
+            return next();
+        }
 
-            const fundCompany = {
-                name: data.name,
-                type: fundCompanyType._id,
-                logo: data.logo,
-            };
+        return res.status(200).send({msg: '创建成功'});
 
-            FundCompanyModel.create(fundCompany, (err) => {
-
-                if (err) {
-
-                    switch (err.code) {
-                        case 11000:
-                            res.status(403).send({errMsg: '基金已经存在'});
-                            break;
-                        default:
-                            res.status(500).send(err);
-                    }
-
-                    return next();
-                }
-
-                return res.status(200).send({msg: '创建成功'});
-
-            });
-
-        });
+    });
     
 };
 
 export function putFundCompany (req, res, next) {
-    
-    const updateFundCompanyFunction = () => {
-        FundCompanyModel.findOneAndUpdate({name: oldName ? oldName : name}, updateFundCompany)
-            .exec((err, fundCompany) => {
-
-                if (err) {
-                    res.status(403).send(err);
-                    return next();
-                }
-
-                if (fundCompany) {
-                    return res.status(200).send({msg: '更新成功'});
-                } else {
-                    res.status(403).send({errMsg: '基金不存在'});
-                    return next();
-                }
-
-            });
-    };
-    
-    const oldName = req.body.oldName;
-    const name = req.body.name;
     
     let updateFundCompany = {};
     
@@ -101,48 +71,55 @@ export function putFundCompany (req, res, next) {
     }
     
     if (updateFundCompany.type) {
-        //find fundCompanyType
-        //update fundCompany.type with _id
-        FundCompanyTypeModel.findOne({name: updateFundCompany.type})
-            .exec((err, fundCompanyType) => {
-                
-                if (err) {
-                    res.status(403).send(err);
-                    return next();
-                }
-                
-                if (fundCompanyType == null) {
-                    res.status(403).send({errMsg: '类型不存在'});
-                    return next();
-                }
-                
-                updateFundCompany.type = fundCompanyType._id;
-                updateFundCompanyFunction();
-            });
-    } else {
-        updateFundCompanyFunction();
+        updateFundCompany.type = mongoose.Types.ObjectId(updateFundCompany.type);
     }
     
-};
-
-export function deleteFundCompany (req, res, next) {
+    const id = req.body._id;
     
-    const name = req.body.name;
-    
-    FundCompanyModel.findOneAndRemove({name})
+    FundCompanyModel.findByIdAndUpdate(id, updateFundCompany)
         .exec((err, fundCompany) => {
 
             if (err) {
                 res.status(403).send(err);
                 return next();
             }
-            
+
             if (fundCompany) {
-                return res.status(200).send({msg: '删除成功'});
+                return res.status(200).send({msg: '更新成功'});
             } else {
-                res.status(403).send({errMsg: '基金不存在'});
+                res.status(403).send({errMsg: '基金公司不存在'});
                 return next();
             }
+
+        });
+    
+};
+
+export function deleteFundCompany (req, res, next) {
+    
+    const id = req.body._id;
+    const name = req.body.name;
+    let query;
+    
+    if (id) {
+        query = FundCompanyModel.findByIdAndRemove(id);
+    } else {
+        query = FundCompanyModel.findOneAndRemove({name});
+    }
+    
+    query.exec((err, fundCompany) => {
+
+        if (err) {
+            res.status(403).send(err);
+            return next();
+        }
+
+        if (fundCompany) {
+            return res.status(200).send({msg: '删除成功'});
+        } else {
+            res.status(403).send({errMsg: '基金公司不存在'});
+            return next();
+        }
 
     });
     

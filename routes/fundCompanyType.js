@@ -3,7 +3,7 @@ import FundCompanyTypeModel from '../models/fundCompanyType';
 export function getFundCompanyType (req, res, next) {
     
     FundCompanyTypeModel.find()
-        .select('name -_id')
+        .select('name')
         .exec((err, fundCompanyTypes) => {
         
             if (err) {
@@ -27,20 +27,20 @@ export function postFundCompanyType (req, res, next) {
     
     FundCompanyTypeModel.create(newFundCompanyType, (err) => {
 
-            if (err) {
-                
-                switch (err.code) {
-                    case 11000:
-                        res.status(403).send({errMsg: '类型已经存在'});
-                        break;
-                    default:
-                        res.status(500).send(err);
-                }
-                
-                return next();
+        if (err) {
+
+            switch (err.code) {
+                case 11000:
+                    res.status(403).send({errMsg: '类型已经存在'});
+                    break;
+                default:
+                    res.status(500).send(err);
             }
 
-            return res.status(200).send({msg: '创建成功'});
+            return next();
+        }
+
+        return res.status(200).send({msg: '创建成功'});
 
     });
     
@@ -48,10 +48,10 @@ export function postFundCompanyType (req, res, next) {
 
 export function putFundCompanyType (req, res, next) {
     
-    const oldName = req.body.oldName;
+    const id = req.body._id;
     const name = req.body.name;
     
-    FundCompanyTypeModel.findOneAndUpdate({name: oldName}, {name})
+    FundCompanyTypeModel.findByIdAndUpdate(id, {name})
         .exec((err, fundCompanyType) => {
 
             if (err) {
@@ -72,22 +72,29 @@ export function putFundCompanyType (req, res, next) {
 
 export function deleteFundCompanyType (req, res, next) {
     
+    const id = req.body._id;
     const name = req.body.name;
+    let query;
     
-    FundCompanyTypeModel.findOneAndRemove({name})
-        .exec((err, fundCompanyType) => {
+    if (id) {
+        query = FundCompanyTypeModel.findByIdAndRemove(id);
+    } else {
+        query = FundCompanyTypeModel.findOneAndRemove({name});
+    }
+    
+    query.exec((err, fundCompanyType) => {
 
-            if (err) {
-                res.status(403).send(err);
-                return next();
-            }
-            
-            if (fundCompanyType) {
-                return res.status(200).send({msg: '删除成功'});
-            } else {
-                res.status(403).send({errMsg: '类型不存在'});
-                return next();
-            }
+        if (err) {
+            res.status(403).send(err);
+            return next();
+        }
+
+        if (fundCompanyType) {
+            return res.status(200).send({msg: '删除成功'});
+        } else {
+            res.status(403).send({errMsg: '类型不存在'});
+            return next();
+        }
 
     });
     
