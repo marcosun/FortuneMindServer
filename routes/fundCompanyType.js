@@ -52,14 +52,19 @@ export function putFundCompanyType (req, res, next) {
     const name = req.body.name;
     
     FundCompanyTypeModel.findOneAndUpdate({name: oldName}, {name})
-        .exec((err) => {
+        .exec((err, fundCompanyType) => {
 
             if (err) {
                 res.status(403).send(err);
                 return next();
             }
 
-            return res.status(200).send({msg: '修改成功'});
+            if (fundCompanyType) {
+                return res.status(200).send({msg: '修改成功'});
+            } else {
+                return res.status(403).send({errMsg: '类型不存在'});
+            }
+            
 
     });
     
