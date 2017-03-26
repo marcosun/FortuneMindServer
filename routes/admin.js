@@ -1,9 +1,21 @@
 import express from 'express';
 
 import User from '../models/user';
+import { getFundCompanyType, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
+import { getFundCompany, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
 import { postUnitTrustFund, putUnitTrustFund } from './unitTrustFund';
 
 const router = express.Router();
+
+router.get('/fundCompanyType', getFundCompanyType);
+router.post('/fundCompanyType', postFundCompanyType);
+router.put('/fundCompanyType', putFundCompanyType);
+router.delete('/fundCompanyType', deleteFundCompanyType);
+
+router.get('/fundCompany', getFundCompany);
+router.post('/fundCompany', postFundCompany);
+router.put('/fundCompany', putFundCompany);
+router.delete('/fundCompany', deleteFundCompany);
 
 router.post('/unitTrustFund', postUnitTrustFund);
 

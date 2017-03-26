@@ -60,11 +60,11 @@ export function putFundCompanyType (req, res, next) {
             }
 
             if (fundCompanyType) {
-                return res.status(200).send({msg: '修改成功'});
+                return res.status(200).send({msg: '更新成功'});
             } else {
-                return res.status(403).send({errMsg: '类型不存在'});
+                res.status(403).send({errMsg: '类型不存在'});
+                return next();
             }
-            
 
     });
     
@@ -85,7 +85,8 @@ export function deleteFundCompanyType (req, res, next) {
             if (fundCompanyType) {
                 return res.status(200).send({msg: '删除成功'});
             } else {
-                return res.status(403).send({errMsg: '类型不存在'});
+                res.status(403).send({errMsg: '类型不存在'});
+                return next();
             }
 
     });
