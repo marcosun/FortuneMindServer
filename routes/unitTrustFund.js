@@ -1,125 +1,143 @@
-import UnitTrustFund from '../models/unitTrustFund';
+import mongoose from 'mongoose';
 
-let dictionary = ['name', 'status', 'issuerName', 'issuerType', 'startFrom', 'term', 'paymentMethod', 'investIndustry', 'progress', 'size', 'sizeStructure', 'salesInfo', 'investArea', 'account', 'investBody', 'investMethod', 'repaySource', 'riskManagement', 'highlight', 'explanation'];
+import UnitTrustFund, { paths } from '../models/unitTrustFund';
 
 export function getUnitTrustFundDeatil (req, res, next) {
     
-    UnitTrustFund.findOne({
-        
-        name: req.query.name,
-        
-    }, {
-        _id: 0,
-        updatedAt: 0,
-        createdAt: 0,
-        __v: 0,
-    }, (err, doc) => {
-        
-        console.log(err);
-        
-        //throw error if err or doc does not exist
-        if (err || doc == null) {
-            res.status(409).send({msg: '该基金不存在'});
-            return next();
-        };
-        
-        return res.status(200).send(doc);
-        
-    });
+    UnitTrustFund.findById(req.query._id)
+        .select('-updatedAt -createdAt -__v')
+        .populate({
+            path: 'issuer',
+            select: '-updatedAt -createdAt -__v',
+            populate: {
+                path: 'type',
+                select: '-updatedAt -createdAt -__v',
+            },
+        })
+        .exec((err, unitTrustFund) => {
+            
+            if (err) {
+                res.status(500).send(err);
+                return next();
+            };
+
+            return res.status(200).send(unitTrustFund);
+
+        });
     
 };
 
 export function getUnitTrustFundDescription (req, res, next) {
     
-    UnitTrustFund.findOne({
+    UnitTrustFund.find({})
+        .select('name salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .exec((err, unitTrustFund) => {
         
-        name: req.query.name,
+            //throw error if err or doc does not exist
+            if (err) {
+                res.status(500).send(err);
+                return next();
+            };
+
+            return res.status(200).send(unitTrustFund);
         
-    }, {
-        
-        _id: 0,
-        name: 1,
-        startFrom: 1,
-        term: 1,
-        investIndustry: 1,
-        progress: 1,
-        status: 1,
-        salesInfo: 1,
-        sizeStructure: 1
-        
-    }, (err, doc) => {
-        
-        console.log(err);
-        
-        //throw error if err or doc does not exist
-        if (err || doc == null) {
-            res.status(409).send({msg: '该基金不存在'});
-            return next();
-        };
-        
-        return res.status(200).send(doc);
-        
-    });
+        });
     
 };
 
 export function postUnitTrustFund (req, res, next) {
     
-    //compose document to be created
-    let newDoc = {};
+    let unitTrustFund = {};
     
-    for (let field of dictionary) {
+    for (let path of paths) {
 
-        if (req.body[field] !== undefined) {
-            newDoc[field] = req.body[field];
+        if (req.body[path] !== undefined) {
+            unitTrustFund[path] = req.body[path];
         }
     }
     
-    UnitTrustFund.create(newDoc, (err) => {
+    if (unitTrustFund.issuer) {
+        unitTrustFund.issuer = mongoose.Types.ObjectId(unitTrustFund.issuer);
+    }
+    
+    if (unitTrustFund.salesPolicies) {
+        unitTrustFund.salesPolicies = JSON.parse(unitTrustFund.salesPolicies);
+    }
+    
+    UnitTrustFund.create(unitTrustFund, (err) => {
+
         if (err) {
-            res.status(409).send(err);
+
+            switch (err.code) {
+                case 11000:
+                    res.status(403).send({errMsg: '基金已经存在'});
+                    break;
+                default:
+                    res.status(500).send(err);
+            }
+
             return next();
-        };
-        
+        }
+
         return res.status(200).send({msg: '创建成功'});
+
     });
     
 };
 
 export function putUnitTrustFund (req, res, next) {
     
-    UnitTrustFund.findOne({
-        
-        name: req.body.name,
-        
-    }, (err, doc) => {
-        
-        //throw error if err or doc does not exist
-        if (err || doc == null) {
-            res.status(409).send({msg: '该基金不存在'});
-            return next();
-        };
-        
-        //iterate over dictionary to update fields
-        for (let field of dictionary) {
-            
-            if (req.body[field] !== undefined) {
-                doc[field] = req.body[field];
-            }
+    let updateUnitTrustFund = {};
+    
+    for (let path of paths) {
+
+        if (req.body[path] !== undefined) {
+            updateUnitTrustFund[path] = req.body[path];
         }
-        
-        //do update with db
-        doc.save((err) => {
-            
+    }
+    
+    if (updateUnitTrustFund.issuer) {
+        updateUnitTrustFund.issuer = mongoose.Types.ObjectId(updateUnitTrustFund.issuer);
+    }
+    
+    if (updateUnitTrustFund.salesPolicies) {
+        updateUnitTrustFund.salesPolicies = JSON.parse(updateUnitTrustFund.salesPolicies);
+    }
+    
+    UnitTrustFund.findByIdAndUpdate(req.body._id, updateUnitTrustFund)
+        .exec((err, unitTrustFund) => {
             if (err) {
-                res.status(409).send(err);
+                res.status(403).send(err);
                 return next();
             }
-            
-            return res.status(200).send({msg: '更新成功'});
+
+            if (unitTrustFund) {
+                return res.status(200).send({msg: '更新成功'});
+            } else {
+                res.status(403).send({errMsg: '基金不存在'});
+                return next();
+            }
         });
-        
-        
+    
+};
+
+export function deleteUnitTrustFund (req, res, next) {
+    
+    UnitTrustFund.findByIdAndRemove(req.body._id)
+        .exec((err, unitTrustFund) => {
+
+        if (err) {
+            res.status(403).send(err);
+            return next();
+        }
+
+        if (unitTrustFund) {
+            return res.status(200).send({msg: '删除成功'});
+        } else {
+            res.status(403).send({errMsg: '基金不存在'});
+            return next();
+        }
+
     });
     
 };

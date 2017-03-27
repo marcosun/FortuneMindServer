@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 import FundCompanyModel, { paths } from '../models/fundCompany';
-import FundCompanyTypeModel from '../models/fundCompanyType';
 
 export function getFundCompany (req, res, next) {
     
