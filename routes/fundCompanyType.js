@@ -2,8 +2,17 @@ import FundCompanyTypeModel from '../models/fundCompanyType';
 
 export function getFundCompanyType (req, res, next) {
     
-    FundCompanyTypeModel.find()
-        .select('name')
+    const id = req.query._id;
+    
+    let query;
+    
+    if (id) {
+        query = FundCompanyTypeModel.findById(id);
+    } else {
+        query = FundCompanyTypeModel.find();
+    }
+    
+    query.select('name')
         .exec((err, fundCompanyTypes) => {
         
             if (err) {
