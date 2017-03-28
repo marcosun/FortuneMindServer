@@ -1,5 +1,7 @@
 import express from 'express';
 
+import upload from '../utils/upload';
+
 import User from '../models/user';
 import { getFundCompanyType, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
 import { getFundCompany, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
@@ -30,6 +32,21 @@ router.post('/user/verifyFinancialPlanner', (req, res, next) => {
                 res.status(200).send({user});
             });
         })
+});
+
+router.post('/upload', (req, res, next) => {
+    upload.single('image')(req, res, (err) => {
+        
+        if (err) {
+            res.status(403).send({errMsg: '图片类型不正确'});
+            return next(err);
+        }
+        
+        res.status(200).send({
+            path: req.file.path,
+            msg: '上传成功',
+        });
+    });
 });
 
 export default router;

@@ -2,40 +2,14 @@ import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import passport from 'passport';
-import multer from 'multer';
 import imagemin from 'imagemin';
 import imageminMozjpeg from 'imagemin-mozjpeg';
+
+import upload from '../utils/upload';
 
 import User from '../models/user';
 
 const router = express.Router();
-
-const upload = multer({
-    
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, 'tmp/tmp');
-        },
-        filename: (req, file, cb) => {
-            cb(null, `${Math.random().toString(36).substring(2)}-${Date.now()}.jpg`);
-        },
-    }),
-    
-    fileFilter: (req, file, cb) => {
-        //accept jpeg only
-        if (file.mimetype !== 'image/jpeg') {
-            return cb(null, false);
-        }
-        
-        cb(null, true);
-    },
-    
-    limits: {
-        fields: 0,
-        fileSize: 1048576,//1M
-        files: 1,
-    },
-});
 
 router.post('/register', function(req, res, next) {
     
