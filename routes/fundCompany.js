@@ -17,7 +17,7 @@ export function getFundCompany (req, res, next) {
     }
     
     query.select('name type logo')
-        .populate('type', 'name -_id')
+        .populate('type', 'name')
         .exec((err, fundCompanies) => {
         
             if (err) {
