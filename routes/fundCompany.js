@@ -139,18 +139,17 @@ export function deleteFundCompany (req, res, next) {
     
     query.exec((err, fundCompany) => {
         
-        //delete image
-        fs.unlink(fundCompany.logo, (err) => {
-            
-        });
-        
-        
         if (err) {
             res.status(403).send(err);
             return next();
         }
 
         if (fundCompany) {
+            //delete image
+            fs.unlink(fundCompany.logo, (err) => {
+
+            });
+            
             return res.status(200).send({msg: '删除成功'});
         } else {
             res.status(403).send({errMsg: '基金公司不存在'});
