@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import mongoose from 'mongoose';
 
 import FundCompanyModel, { paths } from '../models/fundCompany';
@@ -46,23 +48,43 @@ export function postFundCompany (req, res, next) {
         fundCompany.type = mongoose.Types.ObjectId(fundCompany.type);
     }
     
-    FundCompanyModel.create(fundCompany, (err) => {
+    const logoNewAddress = `public/upload/${ fundCompany.logo.split('/')[fundCompany.logo.split('/').length - 1] }`;
+    
+    fs.readFile(fundCompany.logo, (err, data) => {
 
-        if (err) {
+        if (err) throw err;
 
-            switch (err.code) {
-                case 11000:
-                    res.status(403).send({errMsg: '基金公司已经存在'});
-                    break;
-                default:
-                    res.status(500).send(err);
-            }
+        //save tmp image to public folder so that all users have access
+        fs.writeFile(logoNewAddress, data, (err) => {
+            
+            if (err) throw err;
 
-            return next();
-        }
+            //delete temp image
+            fs.unlink(fundCompany.logo, (err) => {
+                
+            });
+            
+            //change image address from temporary folder to public folder so that all users have access
+            fundCompany.logo = logoNewAddress;
+            
+            FundCompanyModel.create(fundCompany, (err) => {
 
-        return res.status(200).send({msg: '创建成功'});
+                if (err) {
 
+                    switch (err.code) {
+                        case 11000:
+                            res.status(403).send({errMsg: '基金公司已经存在'});
+                            break;
+                        default:
+                            res.status(500).send(err);
+                    }
+
+                    return next();
+                }
+                
+                return res.status(200).send({msg: '创建成功'});
+            });
+        })
     });
     
 };
@@ -116,7 +138,13 @@ export function deleteFundCompany (req, res, next) {
     }
     
     query.exec((err, fundCompany) => {
-
+        
+        //delete image
+        fs.unlink(fundCompany.logo, (err) => {
+            
+        });
+        
+        
         if (err) {
             res.status(403).send(err);
             return next();

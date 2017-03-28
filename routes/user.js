@@ -112,7 +112,9 @@ router.post('/upload', upload.single('namecard'), (req, res) => {
     }).then((files) => {
         
         //delete original uploaded file
-        fs.unlinkSync(req.file.path);
+        fs.unlink(req.file.path, (err) => {
+            
+        });
         
         res.status(200).send({
             path: files[0].path,
