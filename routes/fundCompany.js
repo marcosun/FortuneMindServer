@@ -4,8 +4,17 @@ import FundCompanyModel, { paths } from '../models/fundCompany';
 
 export function getFundCompany (req, res, next) {
     
-    FundCompanyModel.find()
-        .select('name type logo')
+    const id = req.query._id;
+    
+    let query;
+    
+    if (id) {
+        query = FundCompanyModel.findById(id);
+    } else {
+        query = FundCompanyModel.find();
+    }
+    
+    query.select('name type logo')
         .populate('type', 'name -_id')
         .exec((err, fundCompanies) => {
         
