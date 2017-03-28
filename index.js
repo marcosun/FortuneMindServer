@@ -46,7 +46,8 @@ import rootRoute from './routes/root';
 import userRoute from './routes/user';
 import adminRoute from './routes/admin';
 app.use('/', rootRoute);
-app.use('/public', express.static('tmp'));
+app.use('/public', express.static('public'));
+app.use('/tmp', express.static('tmp'));
 app.use('/user', userRoute);
 app.use('/admin', adminRoute);
 
