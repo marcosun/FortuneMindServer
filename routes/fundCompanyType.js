@@ -1,22 +1,13 @@
-import FundCompanyTypeModel from '../models/fundCompanyType';
+import { filterObjectWithKeys } from '../utils/utils';
+import FundCompanyTypeModel, { paths } from '../models/fundCompanyType';
 
 export function getFundCompanyType (req, res, next) {
     
-    const id = req.query._id;
-    
-    let query;
-    
-    if (id) {
-        query = FundCompanyTypeModel.findById(id);
-    } else {
-        query = FundCompanyTypeModel.find();
-    }
-    
-    query.select('name')
+    FundCompanyTypeModel.find()
+        .select(paths.toString())
         .exec((err, fundCompanyTypes) => {
-        
+            
             if (err) {
-                res.status(500).send(err);
                 return next();
             }
 
@@ -26,30 +17,41 @@ export function getFundCompanyType (req, res, next) {
     
 };
 
-export function postFundCompanyType (req, res, next) {
+export function getFundCompanyTypeById (req, res, next) {
     
-    const data = req.body;
-    
-    const newFundCompanyType = {
-        name: data.name,
-    };
-    
-    FundCompanyTypeModel.create(newFundCompanyType, (err) => {
-
-        if (err) {
-
-            switch (err.code) {
-                case 11000:
-                    res.status(403).send({errMsg: '类型已经存在'});
-                    break;
-                default:
-                    res.status(500).send(err);
+    FundCompanyTypeModel.findById(req.params.id)
+        .select(paths.toString())
+        .exec((err, fundCompanyType) => {
+        
+            if (err) {
+                return res.status(400).send({error: '参数错误'});
             }
 
-            return next();
-        }
+            return res.status(200).send(fundCompanyType);
+            
+    });
+    
+};
 
-        return res.status(200).send({msg: '创建成功'});
+export function postFundCompanyType (req, res, next) {
+    
+    const newFundCompanyType = filterObjectWithKeys(req.body, paths);
+    
+    FundCompanyTypeModel.create(newFundCompanyType, (err, fundCompanyType) => {
+        
+        if (err) {
+            
+            switch (err.code) {
+                case 11000:
+                    return res.status(400).send({error: '类型已经存在'});
+                    break;
+                default:
+                    return next();
+            }
+            
+        }
+        
+        return res.status(201).send(fundCompanyType);
 
     });
     
@@ -58,21 +60,20 @@ export function postFundCompanyType (req, res, next) {
 export function putFundCompanyType (req, res, next) {
     
     const id = req.body._id;
-    const name = req.body.name;
     
-    FundCompanyTypeModel.findByIdAndUpdate(id, {name})
+    const newFundCompanyType = filterObjectWithKeys(req.body, paths);
+    
+    FundCompanyTypeModel.findByIdAndUpdate(id, newFundCompanyType)
         .exec((err, fundCompanyType) => {
 
             if (err) {
-                res.status(403).send(err);
                 return next();
             }
 
             if (fundCompanyType) {
-                return res.status(200).send({msg: '更新成功'});
+                return res.status(201).send(fundCompanyType);
             } else {
-                res.status(403).send({errMsg: '类型不存在'});
-                return next();
+                return res.status(400).send({error: '类型不存在'});
             }
 
     });
@@ -82,29 +83,16 @@ export function putFundCompanyType (req, res, next) {
 export function deleteFundCompanyType (req, res, next) {
     
     const id = req.body._id;
-    const name = req.body.name;
-    let query;
     
-    if (id) {
-        query = FundCompanyTypeModel.findByIdAndRemove(id);
-    } else {
-        query = FundCompanyTypeModel.findOneAndRemove({name});
-    }
-    
-    query.exec((err, fundCompanyType) => {
+    FundCompanyTypeModel.findByIdAndRemove(id)
+        .exec((err, fundCompanyType) => {
 
-        if (err) {
-            res.status(403).send(err);
-            return next();
-        }
+            if (err) {
+                return next();
+            }
 
-        if (fundCompanyType) {
-            return res.status(200).send({msg: '删除成功'});
-        } else {
-            res.status(403).send({errMsg: '类型不存在'});
-            return next();
-        }
+            return res.status(201).send();
 
-    });
+        });
     
 };

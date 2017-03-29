@@ -3,16 +3,17 @@ import express from 'express';
 import upload from '../utils/upload';
 
 import User from '../models/user';
-import { getFundCompanyType, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
+import { getFundCompanyType, getFundCompanyTypeById, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
 import { getFundCompany, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
 import { postUnitTrustFund, putUnitTrustFund, deleteUnitTrustFund } from './unitTrustFund';
 
 const router = express.Router();
 
-router.get('/fundCompanyType', getFundCompanyType);
-router.post('/fundCompanyType', postFundCompanyType);
-router.put('/fundCompanyType', putFundCompanyType);
-router.delete('/fundCompanyType', deleteFundCompanyType);
+router.get('/fundCompanyTypes', getFundCompanyType);
+router.get('/fundCompanyTypes/:id', getFundCompanyTypeById);
+router.post('/fundCompanyTypes', postFundCompanyType);
+router.put('/fundCompanyTypes', putFundCompanyType);
+router.delete('/fundCompanyTypes', deleteFundCompanyType);
 
 router.get('/fundCompany', getFundCompany);
 router.post('/fundCompany', postFundCompany);
