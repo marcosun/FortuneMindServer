@@ -41,15 +41,16 @@ mongoose.connect('mongodb://localhost/test', function(err) {
     }
 });
 
-// Register routes
-import rootRoute from './routes/root';
-import userRoute from './routes/user';
-import adminRoute from './routes/admin';
-app.use('/', rootRoute);
+//serve static files
 app.use('/public', express.static('public'));
 app.use('/tmp', express.static('tmp'));
-app.use('/user', userRoute);
-app.use('/admin', adminRoute);
+
+// Register routes
+import userRoute from './routes/user';
+import adminRoute from './routes/admin';
+
+app.use('/api/v1/user', userRoute);
+app.use('/api/v1/admin', adminRoute);
 
 app.listen(app.get('port'), function(){
   console.log(("Express server listening on port " + app.get('port')))
