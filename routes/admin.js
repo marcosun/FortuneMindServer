@@ -4,7 +4,7 @@ import upload from '../utils/upload';
 
 import User from '../models/user';
 import { getFundCompanyType, getFundCompanyTypeById, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
-import { getFundCompany, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
+import { getFundCompany, getFundCompanyById, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
 import { postUnitTrustFund, putUnitTrustFund, deleteUnitTrustFund } from './unitTrustFund';
 
 const router = express.Router();
@@ -15,10 +15,11 @@ router.post('/fundCompanyTypes', postFundCompanyType);
 router.put('/fundCompanyTypes', putFundCompanyType);
 router.delete('/fundCompanyTypes', deleteFundCompanyType);
 
-router.get('/fundCompany', getFundCompany);
-router.post('/fundCompany', postFundCompany);
-router.put('/fundCompany', putFundCompany);
-router.delete('/fundCompany', deleteFundCompany);
+router.get('/fundCompanies', getFundCompany);
+router.get('/fundCompanies/:id', getFundCompanyById);
+router.post('/fundCompanies', postFundCompany);
+router.put('/fundCompanies', putFundCompany);
+router.delete('/fundCompanies', deleteFundCompany);
 
 router.post('/unitTrustFund', postUnitTrustFund);
 router.put('/unitTrustFund', putUnitTrustFund);
