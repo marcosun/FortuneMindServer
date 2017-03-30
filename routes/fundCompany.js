@@ -47,9 +47,10 @@ export function postFundCompany (req, res, next) {
         newFundCompany.type = mongoose.Types.ObjectId(newFundCompany.type);
     }
     
-    const logoNewPath = `public/upload/${ newFundCompany.logo.split('/')[newFundCompany.logo.split('/').length - 1] }`;
+    const logoTmpPath = newFundCompany.logo;
+    const logoNewPath = `public/upload/${ logoTmpPath.split('/')[logoTmpPath.split('/').length - 1] }`;
     
-    fs.readFile(newFundCompany.logo, (err, data) => {
+    fs.readFile(logoTmpPath, (err, data) => {
         
         if (err) {
             return next();
@@ -63,7 +64,7 @@ export function postFundCompany (req, res, next) {
             }
 
             //delete temp image
-            fs.unlink(newFundCompany.logo, (err) => {
+            fs.unlink(logoTmpPath, (err) => {
                 
             });
             
@@ -100,17 +101,38 @@ export function putFundCompany (req, res, next) {
         newFundCompany.type = mongoose.Types.ObjectId(newFundCompany.type);
     }
     
-    const logoNewPath = `public/upload/${ newFundCompany.logo.split('/')[newFundCompany.logo.split('/').length - 1] }`;
+    const logoTmpPath = newFundCompany.logo;
+    let logoOldPath;
+    const logoNewPath = `public/upload/${ logoTmpPath.split('/')[logoTmpPath.split('/').length - 1] }`;
     
-    if (logoNewPath == newFundCompany.logo) {
+    if (logoNewPath == logoTmpPath) {
         //if logo image does not update
         //update db straight way
         updateFundCompanyById(res, req, next, id, newFundCompany);
         
     } else {
+        //when logo changes
+        //there are two images to be deleted
+        //one is old image in public folder
+        //the other is tmp image in tmp folder
         
-        //move logo image location in file system before save to db
-        fs.readFile(newFundCompany.logo, (err, data) => {
+        //step1: delete old logo image
+        FundCompanyModel.findById(id)
+            .select('logo')
+            .exec((err, fundCompany) => {
+                if (err || fundCompany == undefined) {
+                    
+                } else {
+                    logoOldPath = fundCompany.logo;
+                    
+                    fs.unlink(logoOldPath, (err) => {
+
+                    });
+                }
+            });
+        
+        //step2: move logo image location in file system before save to db
+        fs.readFile(logoTmpPath, (err, data) => {
 
             if (err) {
                 return next();
@@ -124,8 +146,8 @@ export function putFundCompany (req, res, next) {
                 }
 
                 //delete temp image
-                fs.unlink(newFundCompany.logo, (err) => {
-
+                fs.unlink(logoTmpPath, (err) => {
+                    
                 });
 
                 //change image address from temporary folder to public folder so that all users have access
