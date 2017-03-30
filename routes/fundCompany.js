@@ -68,7 +68,7 @@ export function postFundCompany (req, res, next) {
             });
             
             //change image address from temporary folder to public folder so that all users have access
-            newFundCompany.logo = logoNewAddress;
+            newFundCompany.logo = logoNewPath;
             
             FundCompanyModel.create(newFundCompany, (err, fundCompany) => {
 
@@ -129,7 +129,7 @@ export function putFundCompany (req, res, next) {
                 });
 
                 //change image address from temporary folder to public folder so that all users have access
-                newFundCompany.logo = logoNewAddress;
+                newFundCompany.logo = logoNewPath;
 
                 updateFundCompanyById(res, req, next, id, newFundCompany, next);
             })
