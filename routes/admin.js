@@ -5,7 +5,7 @@ import upload from '../utils/upload';
 import User from '../models/user';
 import { getFundCompanyType, getFundCompanyTypeById, postFundCompanyType, putFundCompanyType, deleteFundCompanyType } from './fundCompanyType';
 import { getFundCompany, getFundCompanyById, postFundCompany, putFundCompany, deleteFundCompany } from './fundCompany';
-import { postUnitTrustFund, putUnitTrustFund, deleteUnitTrustFund } from './unitTrustFund';
+import { getUnitTrustFund, getUnitTrustFundById, getBriefUnitTrustFund, getBriefUnitTrustFundById, postUnitTrustFund, putUnitTrustFund, deleteUnitTrustFund } from './unitTrustFund';
 
 const router = express.Router();
 
@@ -21,9 +21,13 @@ router.post('/fundCompanies', postFundCompany);
 router.put('/fundCompanies', putFundCompany);
 router.delete('/fundCompanies', deleteFundCompany);
 
-router.post('/unitTrustFund', postUnitTrustFund);
-router.put('/unitTrustFund', putUnitTrustFund);
-router.delete('/unitTrustFund', deleteUnitTrustFund);
+router.get('/unitTrustFunds/brief', getBriefUnitTrustFund);
+router.get('/unitTrustFunds/brief/:id', getBriefUnitTrustFundById);
+router.get('/unitTrustFunds', getUnitTrustFund);
+router.get('/unitTrustFunds/:id', getUnitTrustFundById);
+router.post('/unitTrustFunds', postUnitTrustFund);
+router.put('/unitTrustFunds', putUnitTrustFund);
+router.delete('/unitTrustFunds', deleteUnitTrustFund);
 
 router.post('/user/verifyFinancialPlanner', (req, res, next) => {
     User.findByUsername(req.body.mobile)

@@ -1,10 +1,35 @@
 import mongoose from 'mongoose';
+import { filterObjectWithKeys } from '../utils/utils';
 
 import UnitTrustFund, { paths } from '../models/unitTrustFund';
 
-export function getUnitTrustFundDeatil (req, res, next) {
+export function getUnitTrustFund (req, res, next) {
     
-    UnitTrustFund.findById(req.query._id)
+    UnitTrustFund.find()
+        .select('-updatedAt -createdAt -__v')
+        .populate({
+            path: 'issuer',
+            select: '-updatedAt -createdAt -__v',
+            populate: {
+                path: 'type',
+                select: '-updatedAt -createdAt -__v',
+            },
+        })
+        .exec((err, unitTrustFunds) => {
+            
+            if (err) {
+                return next();
+            };
+            
+            return res.status(200).send(unitTrustFunds);
+            
+        });
+    
+};
+
+export function getUnitTrustFundById (req, res, next) {
+    
+    UnitTrustFund.findById(req.params.id)
         .select('-updatedAt -createdAt -__v')
         .populate({
             path: 'issuer',
@@ -17,69 +42,71 @@ export function getUnitTrustFundDeatil (req, res, next) {
         .exec((err, unitTrustFund) => {
             
             if (err) {
-                res.status(500).send(err);
                 return next();
             };
-
+            
             return res.status(200).send(unitTrustFund);
-
+            
         });
     
 };
 
-export function getUnitTrustFundDescription (req, res, next) {
+export function getBriefUnitTrustFund (req, res, next) {
     
-    UnitTrustFund.find({})
+    UnitTrustFund.find()
         .select('name salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
         .exec((err, unitTrustFund) => {
-        
+            
             //throw error if err or doc does not exist
             if (err) {
-                res.status(500).send(err);
                 return next();
             };
-
+            
             return res.status(200).send(unitTrustFund);
-        
+            
+        });
+    
+};
+
+export function getBriefUnitTrustFundById (req, res, next) {
+    
+    UnitTrustFund.findById(req.params.id)
+        .select('name salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .exec((err, unitTrustFund) => {
+            
+            //throw error if err or doc does not exist
+            if (err) {
+                return next();
+            };
+            
+            return res.status(200).send(unitTrustFund);
+            
         });
     
 };
 
 export function postUnitTrustFund (req, res, next) {
     
-    let unitTrustFund = {};
+    const newUnitTrustFund = filterObjectWithKeys(req.body, paths);
     
-    for (let path of paths) {
-
-        if (req.body[path] !== undefined) {
-            unitTrustFund[path] = req.body[path];
-        }
+    if (newUnitTrustFund.issuer) {
+        newUnitTrustFund.issuer = mongoose.Types.ObjectId(newUnitTrustFund.issuer);
     }
     
-    if (unitTrustFund.issuer) {
-        unitTrustFund.issuer = mongoose.Types.ObjectId(unitTrustFund.issuer);
-    }
-    
-    if (unitTrustFund.salesPolicies) {
-        unitTrustFund.salesPolicies = JSON.parse(unitTrustFund.salesPolicies);
-    }
-    
-    UnitTrustFund.create(unitTrustFund, (err) => {
+    UnitTrustFund.create(newUnitTrustFund, (err, unitTrustFund) => {
 
         if (err) {
 
             switch (err.code) {
                 case 11000:
-                    res.status(403).send({errMsg: '基金已经存在'});
+                    return res.status(400).send({error: '基金已经存在'});
                     break;
                 default:
-                    res.status(500).send(err);
+                    return next();
             }
-
-            return next();
         }
 
-        return res.status(200).send({msg: '创建成功'});
+        return res.status(201).send(unitTrustFund);
 
     });
     
@@ -87,35 +114,23 @@ export function postUnitTrustFund (req, res, next) {
 
 export function putUnitTrustFund (req, res, next) {
     
-    let updateUnitTrustFund = {};
+    const newUnitTrustFund = filterObjectWithKeys(req.body, paths);
     
-    for (let path of paths) {
-
-        if (req.body[path] !== undefined) {
-            updateUnitTrustFund[path] = req.body[path];
-        }
+    if (newUnitTrustFund.issuer) {
+        newUnitTrustFund.issuer = mongoose.Types.ObjectId(newUnitTrustFund.issuer);
     }
     
-    if (updateUnitTrustFund.issuer) {
-        updateUnitTrustFund.issuer = mongoose.Types.ObjectId(updateUnitTrustFund.issuer);
-    }
-    
-    if (updateUnitTrustFund.salesPolicies) {
-        updateUnitTrustFund.salesPolicies = JSON.parse(updateUnitTrustFund.salesPolicies);
-    }
-    
-    UnitTrustFund.findByIdAndUpdate(req.body._id, updateUnitTrustFund)
+    UnitTrustFund.findByIdAndUpdate(req.body._id, newUnitTrustFund)
         .exec((err, unitTrustFund) => {
+            
             if (err) {
-                res.status(403).send(err);
                 return next();
             }
 
             if (unitTrustFund) {
-                return res.status(200).send({msg: '更新成功'});
+                return res.status(201).send(unitTrustFund);
             } else {
-                res.status(403).send({errMsg: '基金不存在'});
-                return next();
+                return res.status(400).send({error: '基金不存在'});
             }
         });
     
@@ -126,18 +141,16 @@ export function deleteUnitTrustFund (req, res, next) {
     UnitTrustFund.findByIdAndRemove(req.body._id)
         .exec((err, unitTrustFund) => {
 
-        if (err) {
-            res.status(403).send(err);
-            return next();
-        }
+            if (err) {
+                return next();
+            }
 
-        if (unitTrustFund) {
-            return res.status(200).send({msg: '删除成功'});
-        } else {
-            res.status(403).send({errMsg: '基金不存在'});
-            return next();
-        }
+            if (unitTrustFund) {
+                return res.status(201).send();
+            } else {
+                return res.status(400).send({error: '基金不存在'});
+            }
 
-    });
+        });
     
 };

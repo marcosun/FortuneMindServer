@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-export const paths = ['name', 'status', 'issuer', 'salesDate', 'term', 'paymentMethod', 'investIndustry', 'progress', 'size', 'sizeStructure', 'salesPolicies', 'investProvince', 'investCity', 'accountInfo', 'investTarget', 'investMethod', 'repaySource', 'riskManagement', 'highlights', 'moreInfo'];
+export const paths = ['name', 'status', 'issuer', 'salesDate', 'term', 'paymentMethod', 'investIndustry', 'progress', 'progressDesc', 'size', 'sizeStructure', 'salesPolicies', 'loanToValueRatio', 'investProvince', 'investCity', 'accountInfo', 'investTarget', 'investMethod', 'repaySource', 'riskManagement', 'highlights', 'moreInfo'];
 
 const SalesPolicySchema = new Schema({
 //    {min: 100, max: 300, expectedReturn: 7.2, rebate: 3.5}
@@ -26,7 +26,8 @@ const UnitTrustFundSchema = new Schema({
     issuer: {
         //华创期货
         type: Schema.Types.ObjectId,
-        ref: 'fund.company'
+        ref: 'fund.company',
+        required: true,
     },
     salesDate: {
         type: Date,
@@ -47,6 +48,10 @@ const UnitTrustFundSchema = new Schema({
         //40
         type: Number,
     },
+    progressDesc: {
+        //【2017年3月30日11时更新】本期是第7期，本期规模1400万，已进款800万，募满封账，下一期待定。
+        type: String,
+    },
     size: {
         //25000万
         type: Number,
@@ -57,6 +62,10 @@ const UnitTrustFundSchema = new Schema({
     },
     salesPolicies: {
         type: [SalesPolicySchema],
+    },
+    loanToValueRatio: {
+        //20
+        type: Number,
     },
     investProvince: {
         //贵州
