@@ -105,7 +105,7 @@ export function putFundCompany (req, res, next) {
     if (logoNewPath == newFundCompany.logo) {
         //if logo image does not update
         //update db straight way
-        updateFundCompanyById(id, newFundCompany, next);
+        updateFundCompanyById(res, req, next, id, newFundCompany);
         
     } else {
         
@@ -131,7 +131,7 @@ export function putFundCompany (req, res, next) {
                 //change image address from temporary folder to public folder so that all users have access
                 newFundCompany.logo = logoNewAddress;
 
-                updateFundCompanyById(id, newFundCompany, next);
+                updateFundCompanyById(res, req, next, id, newFundCompany, next);
             })
         });
     }
@@ -164,7 +164,7 @@ export function deleteFundCompany (req, res, next) {
     
 };
 
-const updateFundCompanyById = (id, newFundCompany, next) => {
+const updateFundCompanyById = (res, req, next, id, newFundCompany) => {
     FundCompanyModel.findByIdAndUpdate(id, newFundCompany)
         .exec((err, fundCompany) => {
 
