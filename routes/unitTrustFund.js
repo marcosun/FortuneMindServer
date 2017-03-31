@@ -54,7 +54,11 @@ export function getUnitTrustFundById (req, res, next) {
 export function getBriefUnitTrustFund (req, res, next) {
     
     UnitTrustFund.find()
-        .select('name salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .select('name issuer salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .populate({
+            path: 'issuer',
+            select: '-updatedAt -createdAt -__v',
+        })
         .exec((err, unitTrustFund) => {
             
             //throw error if err or doc does not exist
@@ -71,7 +75,11 @@ export function getBriefUnitTrustFund (req, res, next) {
 export function getBriefUnitTrustFundById (req, res, next) {
     
     UnitTrustFund.findById(req.params.id)
-        .select('name salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .select('name issuer salesDate term investIndustry progress sizeStructure salesPolicies investProvince investCity')
+        .populate({
+            path: 'issuer',
+            select: '-updatedAt -createdAt -__v',
+        })
         .exec((err, unitTrustFund) => {
             
             //throw error if err or doc does not exist
