@@ -8,8 +8,14 @@ import imageminMozjpeg from 'imagemin-mozjpeg';
 import upload from '../utils/upload';
 
 import User from '../models/user';
+import { getUnitTrustFund, getUnitTrustFundById, getBriefUnitTrustFund, getBriefUnitTrustFundById } from './unitTrustFund';
 
 const router = express.Router();
+
+router.get('/unitTrustFunds/brief', getBriefUnitTrustFund);
+router.get('/unitTrustFunds/brief/:id', getBriefUnitTrustFundById);
+router.get('/unitTrustFunds', getUnitTrustFund);
+router.get('/unitTrustFunds/:id', getUnitTrustFundById);
 
 router.post('/register', function(req, res, next) {
     
