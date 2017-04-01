@@ -31,10 +31,12 @@ const UnitTrustFundSchema = new Schema({
     },
     salesDate: {
         type: Date,
+        required: true,
     },
     term: {
         //12
         type: Number,
+        required: true,
     },
     paymentMethod: {
         //半年付息
@@ -47,6 +49,7 @@ const UnitTrustFundSchema = new Schema({
     progress: {
         //40
         type: Number,
+        required: true,
     },
     progressDesc: {
         //【2017年3月30日11时更新】本期是第7期，本期规模1400万，已进款800万，募满封账，下一期待定。
@@ -55,10 +58,12 @@ const UnitTrustFundSchema = new Schema({
     size: {
         //25000万
         type: Number,
+        required: true,
     },
     sizeStructure: {
         //小额畅打
         type: String,
+        required: true,
     },
     salesPolicies: {
         type: [SalesPolicySchema],
@@ -66,6 +71,7 @@ const UnitTrustFundSchema = new Schema({
     loanToValueRatio: {
         //20
         type: Number,
+        required: true,
     },
     investProvince: {
         //贵州
