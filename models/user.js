@@ -3,6 +3,10 @@ import passportLocalMongoose from 'passport-local-mongoose';
 
 const Schema = mongoose.Schema;
 
+export const isPhoneValidator = (value) => {
+    return /^1(3|5|8)\d{9}$/.test(value);
+};
+
 const options = {
     usernameField: 'mobile',
     limitAttempts: true,
@@ -24,9 +28,7 @@ const UserSchema = new Schema({
         required: true, 
         unique: true,
         validate: {
-            validator: (value) => {
-                return /^1(3|5|8)\d{9}$/.test(value);
-            },
+            validator: isPhoneValidator,
             msg: '手机号码格式不正确',
         },
     },

@@ -9,6 +9,7 @@ import upload from '../utils/upload';
 
 import User from '../models/user';
 import { getUnitTrustFund, getUnitTrustFundById, getBriefUnitTrustFund, getBriefUnitTrustFundById } from './unitTrustFund';
+import { getVerificationCode } from './verificationCode';
 
 const router = express.Router();
 
@@ -16,6 +17,8 @@ router.get('/unitTrustFunds/brief', getBriefUnitTrustFund);
 router.get('/unitTrustFunds/brief/:id', getBriefUnitTrustFundById);
 router.get('/unitTrustFunds', getUnitTrustFund);
 router.get('/unitTrustFunds/:id', getUnitTrustFundById);
+
+router.get('/verificationCode', getVerificationCode);
 
 router.post('/register', function(req, res, next) {
     
