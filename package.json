@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=dev node -r babel-register -r babel-polyfill ./index.js",
+    "test": "cross-env NODE_ENV=test node -r babel-register -r babel-polyfill ./index.test.js",
+    "prod": "cross-env NODE_ENV=prod node -r babel-register -r babel-polyfill ./index.prod.js",
     "debug": "cross-env NODE_ENV=dev DEBUG=express* node -r babel-register -r babel-polyfill ./index.js"
   },
   "author": "Marco",
