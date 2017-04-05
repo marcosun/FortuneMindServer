@@ -14,7 +14,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 // main config
 let app = express();
 
-app.set('port', 3000);
+app.set('port', 18110);
 app.use(logger('combined'));
 app.use(cors());
 app.use(bodyParser.json());
@@ -35,7 +35,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/test', function(err) {
+mongoose.connect('mongodb://:@10.105.247.90:18210/prod', function(err) {
     if (err) {
         console.log('Could not connect to mongodb on localhost. Ensure that you have mongodb running on localhost and mongodb accepts connections on standard ports!');
     }
