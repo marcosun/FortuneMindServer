@@ -35,7 +35,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://:@10.105.247.90:18210/prod', function(err) {
+mongoose.connect('mongodb://prod:FortuneMind555@10.105.247.90:18210/prod', function(err) {
     if (err) {
         console.log('Could not connect to mongodb on localhost. Ensure that you have mongodb running on localhost and mongodb accepts connections on standard ports!');
     }
