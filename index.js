@@ -16,12 +16,13 @@ let app = express();
 
 app.set('port', 3000);
 app.use(logger('combined'));
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:8080', credentials: true, }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(cookieParser());
-app.use(cookieSession({secret: 'the princess and the frog', name: 'session',keys: ['key1', 'key2']}));
+//three days auto login
+app.use(cookieSession({ secret: 'britannia rule the wave', maxAge: 3 * 24 * 60 * 60 * 1000, }));
 
 // Configure passport middleware
 app.use(passport.initialize());
