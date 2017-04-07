@@ -46,12 +46,13 @@ mongoose.connect('mongodb://localhost/test', function(err) {
 app.use('/public', express.static('public'));
 app.use('/tmp', express.static('tmp'));
 
+import { ensureAdmin } from './utils/utils';
 // Register routes
 import userRoute from './routes/user';
 import adminRoute from './routes/admin';
 
 app.use('/api/v1/user', userRoute);
-app.use('/api/v1/admin', adminRoute);
+app.use('/api/v1/admin', ensureAdmin, adminRoute);
 
 app.listen(app.get('port'), function(){
   console.log(("Express server listening on port " + app.get('port')))
