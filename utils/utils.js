@@ -38,11 +38,24 @@ export const regexpAlphabetAndNumberOnly = (string) => {
 
 /*
     1. accept user from passport middleware via req.user
-    2. if user does not exist, reject api with status 401 unauthorised
+    2. if not admin, reject api with status 401 unauthorised
 */
 export const ensureAdmin = (req, res, next) => {
     
     if (req.user && req.user.role && req.user.role.indexOf('admin') !== -1 ) {
+        return next();
+    } else {
+        return res.status(401).send({ error: 'Unauthorised'});
+    }
+};
+
+/*
+    1. accept user from passport middleware via req.user
+    2. if not registered user, reject api with status 401 unauthorised
+*/
+export const ensureUser = (req, res, next) => {
+    
+    if (req.user && req.user.role && req.user.role.length !== 0 ) {
         return next();
     } else {
         return res.status(401).send({ error: 'Unauthorised'});

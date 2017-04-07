@@ -6,7 +6,7 @@ import imagemin from 'imagemin';
 import imageminMozjpeg from 'imagemin-mozjpeg';
 
 import upload from '../utils/upload';
-import { isForbiddenViewingRebate } from '../utils/utils';
+import { isForbiddenViewingRebate, ensureAdmin, ensureUser } from '../utils/utils';
 
 import User from '../models/user';
 import { getUnitTrustFund, getUnitTrustFundById, getBriefUnitTrustFund, getBriefUnitTrustFundById } from './unitTrustFund';
@@ -92,6 +92,18 @@ router.post('/adminRegister', function(req, res, next) {
 
 router.post('/login', passport.authenticate('local'), function(req, res) {
     res.status(201).send({
+        msg: '登录成功',
+    });
+});
+
+router.get('/login', ensureUser, function(req, res) {
+    res.status(200).send({
+        msg: '登录成功',
+    });
+});
+
+router.get('/adminLogin', ensureAdmin, function(req, res) {
+    res.status(200).send({
         msg: '登录成功',
     });
 });
