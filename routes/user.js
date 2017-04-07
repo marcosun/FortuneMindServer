@@ -45,6 +45,7 @@ router.post('/adminRegister', function(req, res, next) {
         User.register(new User({
             mobile: req.body.mobile,
             role: ['financialPlanner', 'admin'],
+            isFinancialPlannerVerified: true,
         }), req.body.password, function(err, user) {
 
             if (err)
