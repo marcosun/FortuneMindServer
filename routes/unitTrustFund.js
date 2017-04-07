@@ -3,6 +3,9 @@ import { filterObjectWithKeys } from '../utils/utils';
 
 import UnitTrustFund, { paths } from '../models/unitTrustFund';
 
+/*
+    prohibit exposing rebate if user is not allowed to see the value
+*/
 export function getUnitTrustFund (req, res, next) {
     
     UnitTrustFund.find()
@@ -20,6 +23,18 @@ export function getUnitTrustFund (req, res, next) {
             if (err) {
                 return next();
             };
+            
+            if (req.isForbiddenViewingRebate) {
+                unitTrustFunds = unitTrustFunds.map((fund) => {
+                    
+                    fund.salesPolicies = fund.salesPolicies.map((policy) => {
+                        policy.rebate = null;
+                        return policy;
+                    });
+                    
+                    return fund;
+                });
+            }
             
             return res.status(200).send(unitTrustFunds);
             
@@ -45,6 +60,13 @@ export function getUnitTrustFundById (req, res, next) {
                 return next();
             };
             
+            if (req.isForbiddenViewingRebate) {
+                unitTrustFund.salesPolicies = unitTrustFund.salesPolicies.map((policy) => {
+                    policy.rebate = null;
+                    return policy;
+                });
+            }
+            
             return res.status(200).send(unitTrustFund);
             
         });
@@ -59,14 +81,26 @@ export function getBriefUnitTrustFund (req, res, next) {
             path: 'issuer',
             select: '-updatedAt -createdAt -__v',
         })
-        .exec((err, unitTrustFund) => {
+        .exec((err, unitTrustFunds) => {
             
             //throw error if err or doc does not exist
             if (err) {
                 return next();
             };
             
-            return res.status(200).send(unitTrustFund);
+            if (req.isForbiddenViewingRebate) {
+                unitTrustFunds = unitTrustFunds.map((fund) => {
+                    
+                    fund.salesPolicies = fund.salesPolicies.map((policy) => {
+                        policy.rebate = null;
+                        return policy;
+                    });
+                    
+                    return fund;
+                });
+            }
+            
+            return res.status(200).send(unitTrustFunds);
             
         });
     
@@ -86,6 +120,13 @@ export function getBriefUnitTrustFundById (req, res, next) {
             if (err) {
                 return next();
             };
+            
+            if (req.isForbiddenViewingRebate) {
+                unitTrustFund.salesPolicies = unitTrustFund.salesPolicies.map((policy) => {
+                    policy.rebate = null;
+                    return policy;
+                });
+            }
             
             return res.status(200).send(unitTrustFund);
             
