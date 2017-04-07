@@ -103,12 +103,18 @@ router.post('/login', passport.authenticate('local'), function(req, res) {
 router.get('/login', ensureUser, function(req, res) {
     res.status(200).send({
         msg: '登录成功',
+        mobile: req.user.mobile,
+        role: req.user.role,
+        isFinancialPlannerVerified: req.user.isFinancialPlannerVerified,
     });
 });
 
 router.get('/adminLogin', ensureAdmin, function(req, res) {
     res.status(200).send({
         msg: '登录成功',
+        mobile: req.user.mobile,
+        role: req.user.role,
+        isFinancialPlannerVerified: req.user.isFinancialPlannerVerified,
     });
 });
 
