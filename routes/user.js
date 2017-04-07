@@ -91,8 +91,11 @@ router.post('/adminRegister', function(req, res, next) {
 //});
 
 router.post('/login', passport.authenticate('local'), function(req, res) {
-    res.status(201).send({
+    return res.status(201).send({
         msg: '登录成功',
+        mobile: req.user.mobile,
+        role: req.user.role,
+        isFinancialPlannerVerified: req.user.isFinancialPlannerVerified,
     });
 });
 
